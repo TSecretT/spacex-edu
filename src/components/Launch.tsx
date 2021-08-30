@@ -22,9 +22,11 @@ const getRocketImage = (rocketName: string) => {
 export const Launch = ({ data }: any) => {
 
     return (
-        <div className="launch-container">
-            <Statistic.Countdown value={data.date_unix * 1000} format="DD:HH:mm "/>
-            {data.name}
+        <div className="row launch-container">
+            <div className="col" style={{ width: "auto", alignItems: "flex-start" }}>
+                <Statistic.Countdown value={data.date_unix * 1000} format="DD:HH:mm "/>
+                {data.name}
+            </div>
         </div>
     )
 }
@@ -41,8 +43,8 @@ export const LaunchUpcoming = ({ data }: any) => {
             <Divider />
             <span className="launch-header">Info</span>
             <div className="launch-info-wrap">
+                <img src={data.links.patch.small} alt="patch" className="launch-patch-big" />
                 <Statistic style={{ margin: 16 }} title="Flight number" value={data.flight_number} />
-                {/* <Statistic style={{ margin: 16 }} title="Launch time" value={data.date_unix}  /> */}
             </div>
 
             {data.rocket && <>
@@ -80,15 +82,23 @@ export const LaunchUpcoming = ({ data }: any) => {
                 {data.payloads.map((payload: any) =>(
                     <div className="row" key={payload.id}>
                         <div className="launch-info">
-                            <div className="row launch-info-row">
+                            <div className="row launch-info-row launch-info-wrap">
                                 <Statistic style={{ margin: 16 }} title="Name" value={payload.name} />
                                 <Statistic style={{ margin: 16 }} title="Type" value={payload.type} />
                                 <Statistic style={{ margin: 16 }} title="Orbit" value={payload.orbit} />
                             </div>
-                            <div className="row launch-info-row">
+                            <div className="row launch-info-row launch-info-wrap">
+                                <Statistic style={{ margin: 16 }} title="Customer" value={payload.customers.join(', ')} />
+                                <Statistic style={{ margin: 16 }} title="Nationality" value={payload.nationalities.join(', ')} />
+                                <Statistic style={{ margin: 16 }} title="Manufacturer" value={payload.manufacturers.join(', ')} />
+                            </div>
+                            <div className="row launch-info-row launch-info-wrap">
                                 <Statistic style={{ margin: 16 }} title="Mass" suffix="kg" value={payload.mass_kg} />
                                 <span className="launch-info-comparison">{utils.calculateComparison("mass", compareTo, payload.mass_kg)}</span>
                             </div>
+                            {payload.lifespan_years && <div className="row launch-info-row">
+                                <Statistic style={{ margin: 16 }} title="Lifespan years" value={payload.lifespan_years} />
+                            </div>}
                         </div>
                     </div>
                 ))}
