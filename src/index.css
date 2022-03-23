@@ -1,2 +1,44 @@
-@import '~antd/dist/antd.dark.css';
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  body {
+    @apply min-h-screen w-screen;
+  }
+
+  .page{
+    @apply min-h-screen w-full flex flex-col items-center
+  }
+
+  .launch-container{
+      @apply flex flex-col items-center p-4 my-4
+      border-2 rounded-md
+      w-full max-w-3xl
+  }
+
+  h2 {
+      @apply text-3xl my-4 font-bold
+  }
+
+  .header {
+    @apply w-screen bg-base-300 flex flex-row justify-center p-1
+    md:w-fit md:rounded-b-md
+    transition-all duration-200
+  }
+
+  .header-button {
+    @apply btn btn-ghost normal-case text-xs py-0
+    md:text-xl
+    transition-all duration-200
+  }
+  
+  .header-icon {
+      @apply w-8
+  }
+
+  .loading {
+      @apply animate-spin w-10 m-10;
+  }
+}

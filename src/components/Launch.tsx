@@ -1,8 +1,9 @@
 import React from 'react';
-import { Statistic, Divider } from 'antd';
 
 import { falconNine, falconHeavy } from '../assets';
+import { Payload, UpcomingLaunches } from '../types';
 import utils from '../utils';
+import { useCountdown } from '../utils/countdown';
 
 const getRocketImage = (rocketName: string) => {
     switch (rocketName){
@@ -19,108 +20,114 @@ const getRocketImage = (rocketName: string) => {
     }
 }
 
-export const Launch = ({ data }: any) => {
+export const Launch = ({ data }: { data: UpcomingLaunches }) => {
+    const [days, hours, minutes, seconds] = useCountdown(new Date(data.date_utc));
 
+    const countdownStyleDays: Record<string, number> = { '--value': days }
+    const countdownStyleHours: Record<string, number> = { '--value': hours }
+    const countdownStyleMinutes: Record<string, number> = { '--value': minutes }
+    const countdownStyleSeconds: Record<string, number> = { '--value': seconds }
     return (
-        <div className="row launch-container">
-            <div className="col" style={{ width: "auto", alignItems: "flex-start" }}>
-                <Statistic.Countdown value={data.date_unix * 1000} format="DD:HH:mm "/>
-                {data.name}
-            </div>
+        <div className="launch-container flex flex-row">
+            <span className="countdown font-mono text-xl">
+                T-
+                <span style={countdownStyleDays}></span>:
+                <span style={countdownStyleHours}></span>:
+                <span style={countdownStyleMinutes}></span>:
+                <span style={countdownStyleSeconds}></span>
+            </span>
+            <p className="mx-4">Mission: {data.name}</p>
         </div>
     )
 }
  
-export const LaunchUpcoming = ({ data }: any) => {
-    const [compareTo, setCompareTo] = React.useState<string>("human");
+const Statistic = ({ title, value, description }: { title: string, value: string|number, description?: string }) => {
+    return <div className="stats shadow">
+        <div className="stat">
+            <div className="stat-title">{title}</div>
+            <div className="stat-value">{value}</div>
+            <div className="stat-desc">{description}</div>
+        </div>
+    </div>
+}
 
+export const LaunchUpcoming = ({ data }: { data: UpcomingLaunches }) => {
+    const [compareTo, setCompareTo] = React.useState<string>("human");
+    const [days, hours, minutes, seconds] = useCountdown(new Date(data.date_utc));
+
+    
+    const countdownStyleDays: Record<string, number> = { '--value': days }
+    const countdownStyleHours: Record<string, number> = { '--value': hours }
+    const countdownStyleMinutes: Record<string, number> = { '--value': minutes }
+    const countdownStyleSeconds: Record<string, number> = { '--value': seconds }
 
     return (
-        <div className="col launch-container">
-            <span className="launch-upcoming-name">{data.name}</span>
-            <Statistic.Countdown value={data.date_unix * 1000} format="T-DD:HH:mm:ss"/>
-            <span className="launch-details">{data.details? data.details : "No description provided"}</span>
-            <Divider />
-            <span className="launch-header">Info</span>
-            <div className="launch-info-wrap">
-                <img src={data.links.patch.small} alt="patch" className="launch-patch-big" />
-                <Statistic style={{ margin: 16 }} title="Flight number" value={data.flight_number} />
-            </div>
+        <div className="launch-container">
+            <h2>{data.name}</h2>
+            <span className="countdown font-mono text-2xl my-4">
+                T-
+                <span style={countdownStyleDays}></span>d:
+                <span style={countdownStyleHours}></span>h:
+                <span style={countdownStyleMinutes}></span>m:
+                <span style={countdownStyleSeconds}></span>s
+            </span>
+
+            <p className="alert w-fit">{data.details? data.details : "No description provided by SpaceX"}</p>
 
             {data.rocket && <>
-                <Divider />
-                <span className="launch-header">Rocket</span>
+                <div className="divider"/>
+                <h2>Rocket</h2>
 
-                <div className="row">
-                    <img src={getRocketImage(data.rocket.name)} alt="rocket" />
-                    <div className="launch-info">
-                        <div className="row launch-info-row">
-                            <Statistic style={{ margin: 16 }} title="Name" value={data.rocket.name} />
-                            <Statistic style={{ margin: 16 }} title="Stages" value={data.rocket.stages} />
-                            <Statistic style={{ margin: 16 }} title="Boosters" value={data.rocket.boosters} />
-                        </div>
-                        <div className="row launch-info-row">
-                            <Statistic style={{ margin: 16 }} title="Height" suffix="m" value={data.rocket.height.meters} />
-                            <span className="launch-info-comparison">{utils.calculateComparison("height", compareTo, data.rocket.height.meters)}</span>
-                        </div>
-                        <div className="row launch-info-row">
-                            <Statistic style={{ margin: 16 }} title="Diameter" suffix="m" value={data.rocket.diameter.meters} />
-                            <span className="launch-info-comparison">{utils.calculateComparison("diameter", compareTo, data.rocket.diameter.meters)}</span>
-                        </div>
-                        <div className="row launch-info-row">
-                            <Statistic style={{ margin: 16 }} title="Mass" suffix="kg" value={data.rocket.mass.kg} />
-                            <span className="launch-info-comparison">{utils.calculateComparison("mass", compareTo, data.rocket.mass.kg)}</span>
-                        </div>
+                <div className="flex flex-row w-3/4">
+                    <img className="mx-0 md:mx-8" src={getRocketImage(data.rocket.name)} alt="rocket" />
+                    <div className="flex flex-row flex-wrap h-fit">
+                        <Statistic title="Name" value={data.rocket.name} />
+                        <Statistic title="Stages" value={data.rocket.stages} />
+                        <Statistic title="Boosters" value={data.rocket.boosters} />
+                        <Statistic title="Height" value={data.rocket.height.meters + "m"} description={utils.calculateComparison("height", compareTo, data.rocket.height.meters)} />
+                        <Statistic title="Diameter" value={data.rocket.diameter.meters + "m"} description={utils.calculateComparison("diameter", compareTo, data.rocket.diameter.meters)} />
+                        <Statistic title="Mass" value={data.rocket.mass.kg + "kg"} description={utils.calculateComparison("mass", compareTo, data.rocket.mass.kg)} />
                     </div>
                 </div>
             </>}
 
             {data.payloads.length > 0 && <>
-                <Divider />
-                <span className="launch-header">Payloads</span>
+                <div className="divider"/>
+                <h2>Payloads</h2>
 
-                {data.payloads.map((payload: any) =>(
+                {data.payloads.map((payload: Payload) =>(
                     <div className="row" key={payload.id}>
                         <div className="launch-info">
-                            <div className="row launch-info-row launch-info-wrap">
-                                <Statistic style={{ margin: 16 }} title="Name" value={payload.name} />
-                                <Statistic style={{ margin: 16 }} title="Type" value={payload.type} />
-                                <Statistic style={{ margin: 16 }} title="Orbit" value={payload.orbit} />
+                            <div className="flex flex-row flex-wrap h-fit">
+                                <Statistic title="Name" value={payload.name} />
+                                <Statistic title="Type" value={payload.type} />
+                                <Statistic title="Orbit" value={payload.orbit} />
+                                <Statistic title="Mass" value={payload.mass_kg + "kg"} description={utils.calculateComparison("mass", compareTo, payload.mass_kg)} />
+                                {payload.lifespan_years && <div className="row launch-info-row">
+                                    <Statistic title="Lifespan" value={payload.lifespan_years} description="years" />
+                                </div>}
                             </div>
-                            <div className="row launch-info-row launch-info-wrap">
-                                <Statistic style={{ margin: 16 }} title="Customer" value={payload.customers.join(', ')} />
-                                <Statistic style={{ margin: 16 }} title="Nationality" value={payload.nationalities.join(', ')} />
-                                <Statistic style={{ margin: 16 }} title="Manufacturer" value={payload.manufacturers.join(', ')} />
-                            </div>
-                            <div className="row launch-info-row launch-info-wrap">
-                                <Statistic style={{ margin: 16 }} title="Mass" suffix="kg" value={payload.mass_kg} />
-                                <span className="launch-info-comparison">{utils.calculateComparison("mass", compareTo, payload.mass_kg)}</span>
-                            </div>
-                            {payload.lifespan_years && <div className="row launch-info-row">
-                                <Statistic style={{ margin: 16 }} title="Lifespan years" value={payload.lifespan_years} />
-                            </div>}
                         </div>
                     </div>
                 ))}
             </>}
 
             {data.ships.length > 0 && <>
-                <Divider />
-                <span className="launch-header">Ships</span>                
+                <div className="divider"/>
+                <h2>Ships</h2>                
                 {data.ships.map((ship: any) =>(
                     <div className="row" key={ship.id}>
                         <div className="launch-info">
                             <div className="row launch-info-wrap">
-                                <Statistic style={{ margin: 16 }} title="Name" value={ship.name} />
-                                <Statistic style={{ margin: 16 }} title="Type" value={ship.type} />
-                                <Statistic style={{ margin: 16 }} title="Roles" value={ship.roles.join(', ')} />
-                                <Statistic style={{ margin: 16 }} title="Launches" value={ship.launches.length} />
-                                <Statistic style={{ margin: 16 }} title="Year built" value={ship.year_built}  groupSeparator="" />
-                                <Statistic style={{ margin: 16 }} title="Home port" value={ship.home_port} />
+                                <Statistic title="Name" value={ship.name} />
+                                <Statistic title="Type" value={ship.type} />
+                                <Statistic title="Roles" value={ship.roles.join(', ')} />
+                                <Statistic title="Launches" value={ship.launches.length} />
+                                <Statistic title="Year built" value={ship.year_built} />
+                                <Statistic title="Home port" value={ship.home_port} />
                             </div>
                             {ship.mass_kg && <div className="row launch-info-row">
-                                <Statistic style={{ margin: 16 }} title="Mass" suffix="kg" value={ship.mass_kg} />
-                                <span className="launch-info-comparison">{utils.calculateComparison("mass", compareTo, ship.mass_kg)}</span>
+                                <Statistic title="Mass" value={ship.mass_kg + "kg"} description={utils.calculateComparison("mass", compareTo, ship.mass_kg)} />
                             </div>}
                         </div>
                     </div>
@@ -128,16 +135,16 @@ export const LaunchUpcoming = ({ data }: any) => {
             </>}
 
             {data.launchpad && <>
-                <Divider />
-                <span className="launch-header">Launchpad</span>
-                <span className="launch-details">{data.launchpad.details? data.launchpad.details : "No description provided"}</span>
+                <div className="divider"/>
+                <h2>Launchpad</h2>
+                <p className="px-4 text-center alert">{data.launchpad.details? data.launchpad.details : "No description provided"}</p>
                 <div className="row">
                     <div className="launch-info">
                         <div className="row launch-info-row">
-                            <Statistic style={{ margin: 16 }} title="Name" value={data.launchpad.name} />
-                            <Statistic style={{ margin: 16 }} title="Region" value={data.launchpad.region} />
-                            <Statistic style={{ margin: 16 }} title="Launches" value={data.launchpad.launch_attempts} />
-                            <Statistic style={{ margin: 16 }} title="Status" value={data.launchpad.status} />
+                            <Statistic title="Name" value={data.launchpad.name} />
+                            <Statistic title="Region" value={data.launchpad.region} />
+                            <Statistic title="Launches" value={data.launchpad.launch_attempts} />
+                            <Statistic title="Status" value={data.launchpad.status} />
                         </div>
                     </div>
                 </div>
