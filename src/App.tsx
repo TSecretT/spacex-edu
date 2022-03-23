@@ -1,20 +1,18 @@
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 
 import { Home, Updates, UpcomingLaunches } from './pages';
-import { Header } from './components';
 
 const App = () => {
 
 
 	return (
 		<Router>
-			<Header />
-			<Switch>
-				<Route exact path="/" component={ Home } />
-				<Route exact path="/upcoming-launches" component={ UpcomingLaunches } />
-				<Route exact path="/updates" component={ Updates } />
-			</Switch>
+			<Routes>
+				<Route path="/" element={ <Home /> } />
+				<Route path="/upcoming-launches" element={ <UpcomingLaunches /> } />
+				<Route path="/updates" element={ <Updates /> } />
+			</Routes>
 		</Router>
 	)
 }

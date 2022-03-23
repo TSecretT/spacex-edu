@@ -1,14 +1,23 @@
 import React from 'react'
 
+import { rocketIcon, orbitIcon, homeIcon } from '../assets';
+
 const Header = () => {
     return (
-        <div className="row header-container">
-            <span className="brand">Space X Launches</span>
-            <a href='/' className="header-link">Home</a>
-            <a href='/upcoming-launches' className="header-link">Upcoming launches</a>
-            <a href='/updates' className="header-link">Updates</a>
-            {/* <span className="header-link">Launches</span> */}
-        </div>
+        <>
+            <div className="header hidden sm:flex ">
+                <a className="header-button uppercase" href='/'>SpaceX Launches</a>
+                <a className="header-button" href="/upcoming-launches">Upcoming launches</a>
+                {/* <a className="header-button" href="/updates">Updates</a> */}
+            </div>
+
+            <div className="header sm:hidden">
+                <a className="header-button" href='/'><img src={homeIcon} alt="upcoming" className='header-icon' /></a>
+                <a className="header-button" href="/upcoming-launches"><img src={rocketIcon} alt="upcoming" className='header-icon' /></a>
+                {/* <a className="header-button" href="/past-launches"><img src={orbitIcon} alt="past" className='header-icon' /></a> */}
+            </div>
+    
+        </>
     )
 }
 

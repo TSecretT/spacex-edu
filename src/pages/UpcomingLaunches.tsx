@@ -1,16 +1,16 @@
 import React from 'react';
 
-import { Spin } from 'antd';
 import api from '../api';
 import {earth} from '../assets';
-import { Launch, LaunchUpcoming } from '../components';
+import { Header, Launch, LaunchUpcoming, Loading } from '../components';
+import { UpcomingLaunches as UpcomingLaunchesType } from '../types';
 
 const UpcomingLaunches = () => {
     const [loaded, setLoaded] = React.useState<boolean>(false);
     const [upcomingLaunches, setUpcomingLaunches] = React.useState<any[]>();
 
     const init = async  () => {
-        let upcomingLaunches: any[] = await api.getUpcomingLaunches();
+        let upcomingLaunches: UpcomingLaunchesType[] = await api.getUpcomingLaunches();
         const rockets: any[] = await api.getRockets();
         const payloads: any[] = await api.getPayloads();
         const ships: any[] = await api.getShips();
@@ -37,18 +37,15 @@ const UpcomingLaunches = () => {
         init();
     }, [])
 
-    if(!loaded) return <div className="col"><Spin size="large" /></div>
-
     return (
         <div className="page">
-            <div className="col">
-                {upcomingLaunches?.map((launch: any, i: number) => i===0? <LaunchUpcoming key={i} data={launch} /> : <Launch key={i} data={launch} />)}
-            </div>
+            <Header />
 
-            <div className="col footer">
-                <p>This site is not affiliated with SpaceX or others in any way. It is updated based on API provided by <a href="https://github.com/r-spacex/SpaceX-API">this Github repo</a></p>
-            </div>
-            <img src={earth} alt="earth" style={{ width: "100%" }} ></img>
+            {!loaded && <Loading />}
+            {upcomingLaunches?.map((launch: any, i: number) => i===0? <LaunchUpcoming key={i} data={launch} /> : <Launch key={i} data={launch} />)}
+
+            <p className="max-w-3xl p-4">This site is not affiliated with SpaceX or others in any way. It is updated based on API provided by <a href="https://github.com/r-spacex/SpaceX-API" className="btn-link">this Github repo</a></p>
+            <img src={earth} alt="earth" style={{ width: "100%" }} />
         </div>
     )
 }
